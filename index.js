@@ -130,7 +130,15 @@ async function printStatus() {
 
   const api = require("termux");
   if (api.hasTermux){
-    api.notification()
+    btcPrice =
+      defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].price_usd ||
+      defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].current_price; // coinGecko;
+
+    let btcPriceFormatted =
+    btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
+
+    let notificationOutput = `BTC: ${btcPriceFormatted}`;
+    api.notification(notificationOutput)
    .content(output)
    .id(1)
    .title('Prices')
