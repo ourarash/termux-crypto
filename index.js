@@ -143,8 +143,8 @@ async function printStatus() {
 
     let notificationOutput = `BTC: ${btcPriceFormatted}`;
     api
-      .notification(notificationOutput)
-      .content(output)
+      .notification()
+      .content(notificationOutput)
       .id(1)
       .title("Prices")
       //  .url('...')
