@@ -79,7 +79,7 @@ async function printStatus() {
   let color = "white";
 
   let data = [
-    [`#`, `Symbol`, `Price (USD)`],
+    [`#`, `Symbol`, `Price (USD)`]
     // [
     //   ``, // Number
     //   ``, // Symbol
@@ -87,7 +87,7 @@ async function printStatus() {
     // ]
   ];
 
-  let tableHorizontalLines = [0,1];
+  let tableHorizontalLines = [0, 1];
 
   // keys.forEach((k, i) => {
   keys = Object.keys(defines.Globals.coinMarketCapPricesUsedForAlerts);
@@ -129,21 +129,26 @@ async function printStatus() {
   log(output);
 
   const api = require("termux");
-  if (api.hasTermux){
+  if (
+    api.hasTermux &&
+    Object.keys(defines.Globals.coinMarketCapPricesUsedForAlerts).length > 0 &&
+    defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"]
+  ) {
     btcPrice =
       defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].price_usd ||
       defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].current_price; // coinGecko;
 
     let btcPriceFormatted =
-    btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
+      btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
 
     let notificationOutput = `BTC: ${btcPriceFormatted}`;
-    api.notification(notificationOutput)
-   .content(output)
-   .id(1)
-   .title('Prices')
-  //  .url('...')
-   .run()
+    api
+      .notification(notificationOutput)
+      .content(output)
+      .id(1)
+      .title("Prices")
+      //  .url('...')
+      .run();
   }
 }
 
