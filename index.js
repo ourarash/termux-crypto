@@ -1,5 +1,6 @@
 // const api = require("termux");
 log = console.log;
+const api = require("termux");
 
 var defines = require("./defines");
 var moment = require("moment");
@@ -128,7 +129,6 @@ async function printStatus() {
   let output = table(data, options);
   log(output);
 
-  const api = require("termux");
   if (
     api.hasTermux &&
     Object.keys(defines.Globals.coinMarketCapPricesUsedForAlerts).length > 0 &&
@@ -165,6 +165,15 @@ async function main(options = {}) {
   let maxNumberOfIterations = options.maxNumberOfIterations || 10;
   let loopForEver = options.loopForEver || false;
   log("Please wait...");
+  if (api.hasTermux){
+    api
+      .notification()
+      .content("Updating crypto prices...")
+      .id(1)
+      .title(`Please wait...`)
+      //  .url('...')
+      .run();
+  }
   if (options.getCoinGeckoPrices) {
     await getAllPriceFullCoinGecko();
   }
