@@ -1,0 +1,34 @@
+{
+  "name": "termux-crypto",
+  "version": "1.0.0",
+  "description": "Getting cryptocurrency pricers in Termux",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ourarash/termux-crypto.git"
+  },
+  "keywords": [
+    "crypto",
+    "cryptocurrency",
+    "bitcoin",
+    "btc",
+    "termux",
+    "android",
+    "notifications"
+  ],
+  "author": "Ari Saif",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ourarash/termux-crypto/issues"
+  },
+  "homepage": "https://github.com/ourarash/termux-crypto#readme",
+  "dependencies": {
+    "ansicolor": "^1.1.92",
+    "coingecko-api": "^1.0.5",
+    "moment": "^2.24.0",
+    "table": "^5.4.4"
+  }
+}
