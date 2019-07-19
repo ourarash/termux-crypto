@@ -146,10 +146,9 @@ async function printStatus() {
       .notification()
       .content(notificationOutput)
       .id(1)
-      .title(`Prices updated on (` + moment().format("MM/DD h:mm:ss ")) +
-      `)`
-        //  .url('...')
-        .run();
+      .title(`Prices updated on (` + moment().format("MM/DD h:mm:ss ") + `)`)
+      //  .url('...')
+      .run();
   }
 }
 
