@@ -127,6 +127,16 @@ async function printStatus() {
 
   let output = table(data, options);
   log(output);
+
+  const api = require("termux");
+  if (api.hasTermux){
+    api.notification()
+   .content(output)
+   .id(1)
+   .title('Prices')
+  //  .url('...')
+   .run()
+  }
 }
 
 /**
