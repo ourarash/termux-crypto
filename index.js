@@ -146,7 +146,7 @@ async function printStatus() {
       .notification()
       .content(notificationOutput)
       .id(1)
-      .title("Prices")
+      .title("Prices at "+ moment().format('h:mm:ss'))
       //  .url('...')
       .run();
   }
