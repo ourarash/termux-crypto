@@ -8,7 +8,7 @@ const currencyFormatter = require('currency-formatter');
 
 var log;
 if (api.hasTermux) {
-  const log = require("ololog").configure({
+ log = require("ololog").configure({
     time: { yes: true, print: x => x.toLocaleString().bright.cyan + " " },
     locate: false,
     tag: true
