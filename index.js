@@ -11,7 +11,27 @@ if (api.hasTermux) {
   log = require("ololog").configure({
     time: { yes: true, print: x => x.toLocaleString().bright.cyan + " " },
     locate: false,
-    tag: true
+    tag: (
+      lines,
+      {
+        level = "",
+        levelColor = {
+          info: cyan,
+          warn: yellow,
+          error: red.bright.inverse,
+          debug: blue
+        }
+      }
+    ) => {
+     
+      const levelStr =
+        level && (levelColor[level] || (s => s))(level.toUpperCase());
+
+      return bullet(
+        levelStr.padStart(6) + " ",
+        lines
+      );
+    }
   });
 } else {
   log = require("log-with-statusbar")({
@@ -235,8 +255,8 @@ async function printStatus() {
       .notification()
       .content(notificationOutput)
       .id(1)
-      .title(`Updated on ` + moment().format("MM/DD h:mm") + `, ` +
-      mktCapFormatted
+      .title(
+        `Updated on ` + moment().format("MM/DD h:mm") + `, ` + mktCapFormatted
       )
       //  .url('...')
       .run();
