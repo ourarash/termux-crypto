@@ -200,7 +200,7 @@ async function printStatus() {
     }
   }
   let notificationOutput = "";
-  g_cryptosOfInterest.forEach(c => {
+  g_cryptosOfInterest.forEach((c,i) => {
     let btcPrice =
       defines.Globals.coinMarketCapPricesUsedForAlerts[c].price_usd ||
       defines.Globals.coinMarketCapPricesUsedForAlerts[c].current_price; // coinGecko;
@@ -208,7 +208,10 @@ async function printStatus() {
     let btcPriceFormatted =
       btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
 
-    notificationOutput += `${c}: ${btcPriceFormatted}, `;
+    notificationOutput += `${c}: ${btcPriceFormatted}`;
+    if(i<g_cryptosOfInterest.length-1){
+      notificationOutput += `, `;
+    }
   });
 
   // Calculate marketcap
@@ -224,7 +227,7 @@ async function printStatus() {
   });
   mktCapFormatted = `MKTCAP: ${mktCapFormatted} ${pricePostFix}`;
 
-  log.info("notificationOutput: ", notificationOutput + mktCapFormatted);
+  log.info("notificationOutput: ", notificationOutput.yellow + ', '+ mktCapFormatted.cyan);
 
   if (
     api.hasTermux &&
