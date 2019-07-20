@@ -1,4 +1,3 @@
-
 Globals = {
   options: {
     loopForEver: true,
@@ -14,7 +13,7 @@ Globals = {
   iterationNumber: 0,
   coinGeckoCoinList: [],
   prices: {},
-  globalData:{},
+  globalData: {},
   coinMarketCapPrices: {
     fromArray: [],
     fromNames: []
@@ -39,11 +38,11 @@ Globals = {
     verbosity: 1, //Default verbosity level
     enableStatusBar: true
   },
-  priceUpdateTimestamp: 0
+  priceUpdateTimestamp: 0,
 };
 
 var exports = (module.exports = {
-  Globals: Globals,
-  // options: options, 
+  Globals: Globals
+  // options: options,
   // log: log
 });

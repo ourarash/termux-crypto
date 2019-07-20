@@ -153,14 +153,13 @@ async function printStatus() {
       defines.Globals.coinMarketCapPricesUsedForAlerts[k].price_usd ||
       defines.Globals.coinMarketCapPricesUsedForAlerts[k].current_price; // coinGecko;
 
-    let cmcmktCapFormatted =
+    let cmcPriceFormatted =
       cmcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(cmcPrice);
 
     data.push([
       `${data.length}`, // Number
       `${k}`[color], // Symbol
-
-      `${cmcmktCapFormatted}`
+      `${cmcPriceFormatted}`
     ]);
   }
 
@@ -206,10 +205,10 @@ async function printStatus() {
       defines.Globals.coinMarketCapPricesUsedForAlerts[c].price_usd ||
       defines.Globals.coinMarketCapPricesUsedForAlerts[c].current_price; // coinGecko;
 
-    let btcmktCapFormatted =
+    let btcPriceFormatted =
       btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
 
-    notificationOutput += `${c}: ${btcmktCapFormatted}, `;
+    notificationOutput += `${c}: ${btcPriceFormatted}, `;
   });
 
   // Calculate marketcap
@@ -237,7 +236,9 @@ async function printStatus() {
       .notification()
       .content(notificationOutput)
       .id(1)
-      .title(`Prices updated on (` + moment().format("MM/DD h:mm:ss ") + `)`)
+      .title(`Updated on (` + moment().format("MM/DD h:mm:ss ") + `)` +
+      defines.Globals.mktCapFormatted
+      )
       //  .url('...')
       .run();
   }
