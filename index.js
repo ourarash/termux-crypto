@@ -238,7 +238,7 @@ async function printStatus() {
       .notification()
       .content(notificationOutput)
       .id(1)
-      .title(moment().format("MM/DD h:mm") + `, ` +
+      .title(moment().format("MM/DD h:mm") + `: ` +
       mktCapFormatted
       )
       //  .url('...')
