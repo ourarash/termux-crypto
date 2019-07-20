@@ -5,6 +5,7 @@ const CoinGecko = require("coingecko-api");
 const CoinGeckoClient = new CoinGecko();
 const numeral = require("numeral");
 const currencyFormatter = require("currency-formatter");
+const { cyan, yellow, red, blue } = require("ansicolor");
 
 var log;
 if (api.hasTermux) {
