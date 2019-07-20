@@ -224,8 +224,7 @@ async function printStatus() {
   });
   mktCapFormatted = `MKTCAP: ${mktCapFormatted} ${pricePostFix}`;
 
-  notificationOutput += mktCapFormatted;
-  log.info("notificationOutput: ", notificationOutput);
+  log.info("notificationOutput: ", notificationOutput + mktCapFormatted);
 
   if (
     api.hasTermux &&
