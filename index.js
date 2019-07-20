@@ -3,12 +3,12 @@ const api = require("termux");
 require("ansicolor").nice;
 const CoinGecko = require("coingecko-api");
 const CoinGeckoClient = new CoinGecko();
-const numeral = require('numeral');
-const currencyFormatter = require('currency-formatter');
+const numeral = require("numeral");
+const currencyFormatter = require("currency-formatter");
 
 var log;
 if (api.hasTermux) {
- log = require("ololog").configure({
+  log = require("ololog").configure({
     time: { yes: true, print: x => x.toLocaleString().bright.cyan + " " },
     locate: false,
     tag: true
@@ -220,7 +220,7 @@ async function printStatus() {
 
   pricePostFix = pricePostFix[1].toUpperCase();
   mktCapFormatted = currencyFormatter.format(mktCapFormatted, {
-    code: 'USD',
+    code: "USD",
     precision: 2
   });
   mktCapFormatted = `MKTCAP: ${mktCapFormatted} ${pricePostFix}`;
@@ -276,12 +276,14 @@ async function main() {
     }
   }, 10 * 1000);
 
-  updateStatusBar();
-  defines.Globals.intervals.statusBarTextInterval = setInterval(() => {
-    if (defines.Globals.options.enable) {
-      updateStatusBar();
-    }
-  }, 0.1 * 1000);
+  if (!api.hasTermux) {
+    updateStatusBar();
+    defines.Globals.intervals.statusBarTextInterval = setInterval(() => {
+      if (defines.Globals.options.enable) {
+        updateStatusBar();
+      }
+    }, 0.1 * 1000);
+  }
 }
 
 main();
