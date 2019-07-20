@@ -28,8 +28,14 @@
   "dependencies": {
     "ansicolor": "^1.1.92",
     "coingecko-api": "^1.0.5",
+    "currency-formatter": "^1.5.4",
     "moment": "^2.24.0",
+    "numeral": "^2.0.6",
+    "ololog": "^1.1.144",
     "table": "^5.4.4",
     "termux": "^1.1.0"
+  },
+  "optionalDependencies": {
+    "log-with-statusbar": "^1.1.15"
   }
 }

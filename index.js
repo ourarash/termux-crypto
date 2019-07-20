@@ -1,6 +1,31 @@
 // const api = require("termux");
-log = console.log;
 const api = require("termux");
+require("ansicolor").nice;
+const CoinGecko = require("coingecko-api");
+const CoinGeckoClient = new CoinGecko();
+const numeral = require('numeral');
+const currencyFormatter = require('currency-formatter');
+
+var log;
+if (api.hasTermux) {
+  const log = require("ololog").configure({
+    time: { yes: true, print: x => x.toLocaleString().bright.cyan + " " },
+    locate: false,
+    tag: true
+  });
+} else {
+  log = require("log-with-statusbar")({
+    ololog_configure: {
+      time: { yes: true, print: x => x.toLocaleString().bright.cyan + " " },
+      locate: false,
+      tag: true
+    },
+    initialStatusTextArray: ["Please wait..."],
+    minVerbosity: 1, //Minimum verbosity level
+    verbosity: 1, //Default verbosity level
+    enableStatusBar: true
+  });
+}
 
 var defines = require("./defines");
 var moment = require("moment");
@@ -9,12 +34,21 @@ require("ansicolor").nice;
 
 const { table, getBorderCharacters } = require("table");
 
-var g_cryptosOfInterest = [`BTC`, `ETH`];
+var g_cryptosOfInterest = [`BTC`, `ETH`, `LTC`];
+var g_printStatusCounter = 0;
+let statusBarText = Array(3);
+//-----------------------------------------------------------------------------
+async function getGlobalMarketData() {
+  log.info("Getting global market data from CoinGecko...");
 
+  let data = await CoinGeckoClient.global();
+  defines.Globals.globalData = data.data.data;
+  log.info("Successfully updated CoinGecko global market data!");
+}
+//-----------------------------------------------------------------------------
 async function getAllPriceFullCoinGecko() {
-  log("Getting prices from Coin Gecko...");
-  const CoinGecko = require("coingecko-api");
-  const CoinGeckoClient = new CoinGecko();
+  log.info("Getting prices from Coin Gecko...");
+
   let coinList = await CoinGeckoClient.coins.list();
   if (coinList && coinList.success) {
     let markets = [];
@@ -63,14 +97,32 @@ async function getAllPriceFullCoinGecko() {
       try {
         defines.Globals.coinMarketCapPricesUsedForAlerts[symbol] = c;
       } catch (e) {
-        log("Error: ", e);
+        log.info("Error: ", e);
       }
     });
 
     defines.Globals.prices = prices;
-
-    log("Successfully Updated CoinGecko prices!");
+    defines.Globals.priceUpdateTimestamp = moment().valueOf();
+    log.info("Successfully Updated CoinGecko prices!");
   }
+}
+//-----------------------------------------------------------------------------
+
+async function updateStatusBar() {
+  // let frames = log.getSpinners().moon.frames.concat(log.getSpinners().earth.frames);
+  let frames = log.getSpinners().dots.frames;
+
+  statusBarText[0] =
+    frames[g_printStatusCounter++ % frames.length].toString().bright.green +
+    ` Prices as of: ` +
+    moment(defines.Globals.priceUpdateTimestamp).format(
+      `MM/DD/YYYY, h:mm:ss A`
+    );
+  var filtered = statusBarText.filter(el => {
+    return el != null;
+  });
+
+  log.setStatusBarText(filtered);
 }
 //-----------------------------------------------------------------------------
 /**
@@ -101,14 +153,14 @@ async function printStatus() {
       defines.Globals.coinMarketCapPricesUsedForAlerts[k].price_usd ||
       defines.Globals.coinMarketCapPricesUsedForAlerts[k].current_price; // coinGecko;
 
-    let cmcPriceFormatted =
+    let cmcmktCapFormatted =
       cmcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(cmcPrice);
 
     data.push([
-      `${i + 1}`, // Number
+      `${data.length}`, // Number
       `${k}`[color], // Symbol
 
-      `${cmcPriceFormatted}`
+      `${cmcmktCapFormatted}`
     ]);
   }
 
@@ -120,28 +172,67 @@ async function printStatus() {
      * @return {boolean}
      */
     drawHorizontalLine: (index, size) => {
-      // console.log('index: ', JSON.stringify(index));
+      // console.log.info('index: ', JSON.stringify(index));
       // return tableHorizontalLines.indexOf(index) < 0;
       return true;
     }
   };
 
   let output = table(data, options);
-  log(output);
+  if (
+    Object.keys(defines.Globals.coinMarketCapPricesUsedForAlerts).length > 0
+  ) {
+    if (api.hasTermux) {
+      log.info(output);
+    } else {
+      let rowsFormat = output.split("\n");
+
+      let i = 1;
+      rowsFormat.forEach(r => {
+        if (r != "") {
+          statusBarText[i++] = r;
+        }
+      });
+
+      let newArray = [];
+      newArray.push(statusBarText[0]);
+      newArray = newArray.concat(rowsFormat);
+      statusBarText = newArray;
+    }
+  }
+  let notificationOutput = "";
+  g_cryptosOfInterest.forEach(c => {
+    let btcPrice =
+      defines.Globals.coinMarketCapPricesUsedForAlerts[c].price_usd ||
+      defines.Globals.coinMarketCapPricesUsedForAlerts[c].current_price; // coinGecko;
+
+    let btcmktCapFormatted =
+      btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
+
+    notificationOutput += `${c}: ${btcmktCapFormatted}, `;
+  });
+
+  // Calculate marketcap
+  let mktCapFormatted = numeral(
+    defines.Globals.globalData.total_market_cap.usd
+  ).format("0.00 a");
+  let pricePostFix = /\S+\s+(.*)/.exec(mktCapFormatted);
+
+  pricePostFix = pricePostFix[1].toUpperCase();
+  mktCapFormatted = currencyFormatter.format(mktCapFormatted, {
+    code: 'USD',
+    precision: 2
+  });
+  mktCapFormatted = `MKTCAP: ${mktCapFormatted} ${pricePostFix}`;
+
+  notificationOutput += mktCapFormatted;
+  log.info("notificationOutput: ", notificationOutput);
 
   if (
     api.hasTermux &&
     Object.keys(defines.Globals.coinMarketCapPricesUsedForAlerts).length > 0 &&
     defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"]
   ) {
-    btcPrice =
-      defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].price_usd ||
-      defines.Globals.coinMarketCapPricesUsedForAlerts["BTC"].current_price; // coinGecko;
-
-    let btcPriceFormatted =
-      btcPrice <= 0 ? "N/A".yellow : utility_functions.formatPrice(btcPrice);
-
-    let notificationOutput = `BTC: ${btcPriceFormatted}`;
     api
       .notification()
       .content(notificationOutput)
@@ -151,21 +242,13 @@ async function printStatus() {
       .run();
   }
 }
-
+//-----------------------------------------------------------------------------
 /**
  *
- * @param {object} options
- * @param {number} options.maxNumberOfIterations
- * @param {boolean} options.loopForEver
- * @param {boolean} options.getCoinGeckoPrices
- * @param {boolean} options.getForexData_oxr
  */
-async function main(options = {}) {
+async function main() {
   defines.Globals.startTime = moment().valueOf();
-  let maxNumberOfIterations = options.maxNumberOfIterations || 10;
-  let loopForEver = options.loopForEver || false;
-  log("Please wait...");
-  if (api.hasTermux){
+  if (api.hasTermux) {
     api
       .notification()
       .content("Updating crypto prices...")
@@ -174,16 +257,11 @@ async function main(options = {}) {
       //  .url('...')
       .run();
   }
-  if (options.getCoinGeckoPrices) {
+
+  if (defines.Globals.options.getCoinGeckoPrices) {
     await getAllPriceFullCoinGecko();
+    await getGlobalMarketData();
   }
-  // if (options.getForexData_oxr) {
-  //   getForexData_oxr();
-  // } else {
-  //   log.warn(
-  //     "getForexData_oxr is false. Tickers with forex currencies will not be calculated."
-  //   );
-  // }
 
   defines.Globals.intervals.aggregatePriceInterval = setInterval(() => {
     if (defines.Globals.options.enable) {
@@ -194,15 +272,16 @@ async function main(options = {}) {
   defines.Globals.intervals.coingGeckoUpdateInterval = setInterval(() => {
     if (defines.Globals.options.enable) {
       getAllPriceFullCoinGecko();
+      getGlobalMarketData();
     }
   }, 10 * 1000);
 
-  // updateStatusBar();
-  // defines.Globals.intervals.statusBarTextInterval = setInterval(() => {
-  //   if (defines.Globals.options.enable) {
-  //     updateStatusBar();
-  //   }
-  // }, 0.1 * 1000);
+  updateStatusBar();
+  defines.Globals.intervals.statusBarTextInterval = setInterval(() => {
+    if (defines.Globals.options.enable) {
+      updateStatusBar();
+    }
+  }, 0.1 * 1000);
 }
 
 main();

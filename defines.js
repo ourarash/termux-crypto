@@ -14,6 +14,7 @@ Globals = {
   iterationNumber: 0,
   coinGeckoCoinList: [],
   prices: {},
+  globalData:{},
   coinMarketCapPrices: {
     fromArray: [],
     fromNames: []
@@ -37,7 +38,8 @@ Globals = {
     minVerbosity: 1, //Minimum verbosity level
     verbosity: 1, //Default verbosity level
     enableStatusBar: true
-  }
+  },
+  priceUpdateTimestamp: 0
 };
 
 var exports = (module.exports = {
