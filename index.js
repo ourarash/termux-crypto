@@ -237,7 +237,7 @@ async function printStatus() {
       .content(notificationOutput)
       .id(1)
       .title(`Updated on (` + moment().format("MM/DD h:mm:ss ") + `)` +
-      defines.Globals.mktCapFormatted
+      mktCapFormatted
       )
       //  .url('...')
       .run();
