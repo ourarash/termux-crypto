@@ -28,7 +28,7 @@ if (api.hasTermux) {
       const levelStr =
         level && (levelColor[level] || (s => s))(level.toUpperCase());
 
-      return bullet(
+      return (
         levelStr.padStart(6) + " ",
         lines
       );
