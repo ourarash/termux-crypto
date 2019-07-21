@@ -5,6 +5,10 @@ Globals = {
     maxNumberOfIterations: 10,
     getCoinGeckoPrices: true,
     getForexData_oxr: false,
+    initialCallback: null,
+    updateValuesCallback: null,
+    cryptosOfInterest : [`BTC`, `ETH`, `LTC`],
+    updateIntervalInSeconds: 5,
     // control
     enable: true // Used for start/stop
   },
@@ -18,7 +22,7 @@ Globals = {
     fromArray: [],
     fromNames: []
   },
-  coinMarketCapPricesUsedForAlerts: {},
+  cryptoPrices: {},
   generalMarketData: {},
   forex: {},
   osx_app_id: "39282bee7c1a40309826a02e0f09438a",
